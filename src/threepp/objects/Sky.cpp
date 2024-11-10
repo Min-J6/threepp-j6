@@ -16,7 +16,7 @@ Sky::Sky(): Mesh(BoxGeometry::create(1, 1, 1), ShaderMaterial::create()) {
             {"mieCoefficient", Uniform(0.005f)},
             {"mieDirectionalG", Uniform(0.8f)},
             {"sunPosition", Uniform(Vector3())},
-            {"up", Uniform(Vector3(0, 1, 0))},
+            {"up", Uniform(Vector3(0, 0, 1))},
     };
 
     auto vertexShader = R"(

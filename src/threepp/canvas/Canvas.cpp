@@ -183,9 +183,12 @@ struct Canvas::Impl {
 #ifndef EMSCRIPTEN
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        // glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, params.resizable_);
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 #endif
 
         if (params.antialiasing_ > 0) {
@@ -197,6 +200,7 @@ struct Canvas::Impl {
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
+
 
 #if EMSCRIPTEN
 #pragma GCC diagnostic push
@@ -238,7 +242,8 @@ struct Canvas::Impl {
     }
 
     void setSize(std::pair<int, int> size) const {
-
+        //glfwGetFramebufferSize(window, &size.first, &size.second);
+        //glViewport(0, 0, size.first, size.second);
         glfwSetWindowSize(window, size.first, size.second);
     }
 
@@ -321,7 +326,7 @@ struct Canvas::Impl {
         const auto p = static_cast<Impl*>(glfwGetWindowUserPointer(w));
 
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS && p->exitOnKeyEscape_) {
-            glfwSetWindowShouldClose(w, GLFW_TRUE);
+           // glfwSetWindowShouldClose(w, GLFW_TRUE);
             return;
         }
 

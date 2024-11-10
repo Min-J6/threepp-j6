@@ -14,7 +14,7 @@ option(THREEPP_TREAT_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 # Force THREEPP_WITH_GLFW ON when targeting Emscripten
 cmake_dependent_option(THREEPP_WITH_GLFW "Build with GLFW frontend" ON "NOT DEFINED EMSCRIPTEN" ON)
 # Force THREEPP_USE_EXTERNAL_GLFW OFF if NOT THREEPP_WITH_GLFW
-cmake_dependent_option(THREEPP_USE_EXTERNAL_GLFW "Use externally supplied GLFW" OFF "THREEPP_WITH_GLFW" OFF)
+cmake_dependent_option(THREEPP_USE_EXTERNAL_GLFW "Use externally supplied GLFW" ON "THREEPP_WITH_GLFW" ON)
 # Build embedded GLFW with X11 support on UNIX systems
 cmake_dependent_option(THREEPP_EMBEDDED_GLFW_WITH_X11 "Build GLFW with X11 support" OFF "NOT THREEPP_USE_EXTERNAL_GLFW;UNIX;NOT APPLE" OFF)
 
@@ -46,7 +46,7 @@ if (DEFINED EMSCRIPTEN)
 else ()
 
     if (THREEPP_USE_EXTERNAL_GLFW)
-        find_package(glfw3 CONFIG REQUIRED)
+        # find_package(glfw3 CONFIG REQUIRED)
 
         if (NOT TARGET "glfw::glfw" AND TARGET "glfw")
             add_library(glfw::glfw ALIAS glfw)

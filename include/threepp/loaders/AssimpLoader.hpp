@@ -5,6 +5,8 @@
 #include "threepp/loaders/Loader.hpp"
 #include "threepp/loaders/TextureLoader.hpp"
 #include "threepp/materials/MeshStandardMaterial.hpp"
+#include "threepp/materials/MeshPhongMaterial.hpp"
+#include "threepp/materials/MeshToonMaterial.hpp"
 #include "threepp/objects/Group.hpp"
 #include "threepp/objects/Mesh.hpp"
 #include "threepp/objects/SkinnedMesh.hpp"
@@ -57,7 +59,13 @@ namespace threepp {
             parent.add(group);
 
             auto meshes = parseNodeMeshes(info, aiScene, aiNode);
-            for (const auto& mesh : meshes) group->add(mesh);
+            for (const auto& mesh : meshes) {
+
+                // mesh->rotateX(AI_DEG_TO_RAD(90)); // rotate x 90
+                mesh->castShadow = true;
+                mesh->receiveShadow = true;
+                group->add(mesh);
+            }
 
             for (unsigned i = 0; i < aiNode->mNumChildren; ++i) {
                 parseNodes(info, aiScene, aiNode->mChildren[i], *group);
@@ -74,7 +82,7 @@ namespace threepp {
                 const auto aiMesh = aiScene->mMeshes[meshIndex];
 
                 auto geometry = BufferGeometry::create();
-                auto material = MeshStandardMaterial::create();
+                auto material = MeshToonMaterial::create();
                 setupMaterial(info.path, aiScene, aiMesh, *material);
 
                 std::shared_ptr<Mesh> mesh;
@@ -96,7 +104,12 @@ namespace threepp {
 
                     mesh = Mesh::create(geometry, material);
                 }
+
+                auto name_ = std::filesystem::path(info.path).stem().string();
                 mesh->name = aiMesh->mName.C_Str();
+                if (mesh->name.empty()) {
+                    mesh->name = name_ + "_" + "mesh";
+                }
 
                 std::vector<unsigned int> indices;
                 std::vector<float> vertices;
@@ -339,7 +352,7 @@ namespace threepp {
             }
         }
 
-        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshStandardMaterial& material) {
+        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshToonMaterial& material) {
             if (aiScene->HasMaterials()) {
                 aiString p;
                 auto mi = aiMesh->mMaterialIndex;
@@ -359,6 +372,7 @@ namespace threepp {
                     }
                 }
 
+                // light map
                 if (aiGetMaterialTextureCount(mat, aiTextureType_EMISSIVE) > 0) {
                     if (aiGetMaterialTexture(mat, aiTextureType_EMISSIVE, 0, &p) == aiReturn_SUCCESS) {
                         auto tex = loadTexture(aiScene, path, p.C_Str());
@@ -378,22 +392,54 @@ namespace threepp {
                     material.emissiveIntensity = emmisiveIntensity;
                 }
 
-                //                if (aiGetMaterialTextureCount(mat, aiTextureType_SPECULAR) > 0) {
-                //                    if (aiGetMaterialTexture(mat, aiTextureType_SPECULAR, 0, &p) == aiReturn_SUCCESS) {
-                //                        auto tex = loadTexture(aiScene, path, p.C_Str());
-                //                        material.specularMap = tex;
-                //                    }
-                //                } else {
-                //                    C_STRUCT aiColor4D specular;
-                //                    if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_SPECULAR, &specular)) {
-                //                        material.specular.setRGB(specular.r, specular.g, specular.b);
-                //                    }
-                //                }
+                // normal map
+                if (aiGetMaterialTextureCount(mat, aiTextureType_NORMALS) > 0) {
+                    if (aiGetMaterialTexture(mat, aiTextureType_NORMALS, 0, &p) == aiReturn_SUCCESS) {
+                        auto tex = loadTexture(aiScene, path, p.C_Str());
+                        material.normalMap = tex;
 
-                //                float shininess;
-                //                if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_SHININESS, &shininess)) {
-                //                    material.shininess = shininess;
-                //                }
+                        handleWrapping(mat, aiTextureType_NORMALS, *tex);
+                    }
+                }
+
+                // no use for toon material
+                // // roughness map
+                // if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
+                //     if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE_ROUGHNESS, 0, &p) == aiReturn_SUCCESS) {
+                //         auto tex = loadTexture(aiScene, path, p.C_Str());
+                //         material.roughnessMap = tex;
+                //
+                //         handleWrapping(mat, aiTextureType_DIFFUSE_ROUGHNESS, *tex);
+                //     }
+                // }
+                //
+                // // metalness map
+                // if (aiGetMaterialTextureCount(mat, aiTextureType_METALNESS) > 0) {
+                //     if (aiGetMaterialTexture(mat, aiTextureType_METALNESS, 0, &p) == aiReturn_SUCCESS) {
+                //         auto tex = loadTexture(aiScene, path, p.C_Str());
+                //         material.metalnessMap = tex;
+                //
+                //         handleWrapping(mat, aiTextureType_METALNESS, *tex);
+                //     }
+                // }
+
+                // // ?
+                //                  if (aiGetMaterialTextureCount(mat, aiTextureType_SPECULAR) > 0) {
+                //                      if (aiGetMaterialTexture(mat, aiTextureType_SPECULAR, 0, &p) == aiReturn_SUCCESS) {
+                //                          auto tex = loadTexture(aiScene, path, p.C_Str());
+                //                          material.specularMap = tex;
+                //                      }
+                //                  } else {
+                //                      C_STRUCT aiColor4D specular;
+                //                      if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_SPECULAR, &specular)) {
+                //                          material.specular.setRGB(specular.r, specular.g, specular.b);
+                //                      }
+                //                  }
+                //
+                //                  float shininess;
+                //                  if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_SHININESS, &shininess)) {
+                //                      material.shininess = shininess;
+                //                  }
 
 
                 // should this be added?

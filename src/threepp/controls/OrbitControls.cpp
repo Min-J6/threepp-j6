@@ -572,7 +572,6 @@ void OrbitControls::panCamera(float deltaX, float deltaY) {
 
 // Update camera based on mouse input
 void OrbitControls::updateFromMouseInput(float deltaX, float deltaY, float wheelDelta, bool isMiddleMouseDown, bool isShiftDown, bool isCtrlDown) {
-    std::cout << "deltaY " << deltaY << std::endl;
     if (isMiddleMouseDown) {
         if (isShiftDown) {
             // Shift + 휠클릭 드래그 = Pan

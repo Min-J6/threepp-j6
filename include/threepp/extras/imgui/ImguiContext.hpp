@@ -15,9 +15,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "myTool/VirtualSpace/compressed_font//RobotoRegular.cpp"
-#include "myTool/VirtualSpace/compressed_font/RobotoMedium.cpp"
-#include "myTool/VirtualSpace/compressed_font/MaterialIcons.cpp"
+#include "RobotoRegular.cpp"
+#include "RobotoMedium.cpp"
+#include "MaterialIcons.cpp"
 
 class ImguiContext {
 

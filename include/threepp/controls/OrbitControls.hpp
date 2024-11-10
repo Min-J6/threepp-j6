@@ -74,6 +74,23 @@ namespace threepp {
     private:
         struct Impl;
         std::unique_ptr<Impl> pimpl_;
+
+
+    // Custom code by jusik
+    public:
+        void moveForward(float distance);
+
+        // Rotate camera based on mouse drag
+        void rotateCamera(float deltaX, float deltaY);
+
+        // Zoom camera based on mouse wheel
+        void zoomCamera(float zoomDelta);
+
+        // Pan camera based on mouse drag
+        void panCamera(float deltaX, float deltaY);
+
+        // Update camera based on mouse input
+        void updateFromMouseInput(float deltaX, float deltaY, float wheelDelta, bool isLeftMouseDown, bool isShiftDown, bool isCtrlDown);
     };
 
 }// namespace threepp

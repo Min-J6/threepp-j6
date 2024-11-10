@@ -64,8 +64,9 @@ struct OrbitControls::Impl {
           keyListener(std::make_unique<MyKeyListener>(scope)),
           mouseListener(std::make_unique<MyMouseListener>(scope)) {
 
-        canvas.addMouseListener(*mouseListener);
-        canvas.addKeyListener(*keyListener);
+        // Custom code by jusik
+        // canvas.addMouseListener(*mouseListener);
+        // canvas.addKeyListener(*keyListener);
 
         update();
     }
@@ -537,3 +538,76 @@ float OrbitControls::getZoomScale() const {
 }
 
 OrbitControls::~OrbitControls() = default;
+
+// Rotate camera based on mouse drag
+void OrbitControls::rotateCamera(float deltaX, float deltaY) {
+    if (enabled && enableRotate) {
+        float rotateSpeed = 0.005f;  // Adjust this value to control rotation speed
+        pimpl_->rotateLeft(deltaX * rotateSpeed);
+        pimpl_->rotateUp(deltaY * rotateSpeed);
+        update();
+    }
+}
+
+// Zoom camera based on mouse wheel
+void OrbitControls::zoomCamera(float zoomDelta) {
+    if (enabled && enableZoom) {
+        if (zoomDelta > 0) {
+            pimpl_->dollyIn(getZoomScale());
+        } else if (zoomDelta < 0) {
+            pimpl_->dollyOut(getZoomScale());
+        }
+        update();
+    }
+}
+
+// Pan camera based on mouse drag
+void OrbitControls::panCamera(float deltaX, float deltaY) {
+    if (enabled && enablePan) {
+        float panSpeed = 1.0f;  // Adjust this value to control pan speed
+        pimpl_->pan(deltaX * panSpeed, deltaY * panSpeed);
+        update();
+    }
+}
+
+// Update camera based on mouse input
+void OrbitControls::updateFromMouseInput(float deltaX, float deltaY, float wheelDelta, bool isMiddleMouseDown, bool isShiftDown, bool isCtrlDown) {
+    std::cout << "deltaY " << deltaY << std::endl;
+    if (isMiddleMouseDown) {
+        if (isShiftDown) {
+            // Shift + 휠클릭 드래그 = Pan
+            panCamera(deltaX, deltaY);
+        }
+        else if (isCtrlDown) {
+            // Ctrl + 휠클릭 드래그 = Zoom
+            moveForward(-deltaY * 0.01);
+        }
+        else {
+            // 휠클릭 드래그 = Rotate
+            rotateCamera(deltaX, deltaY);
+        }
+    }
+
+    // 일반 휠 스크롤로도 줌 가능
+    if (wheelDelta != 0.0f) {
+        zoomCamera(-wheelDelta * 0.1f);
+    }
+}
+
+void OrbitControls::moveForward(float distance) {
+    if (enabled) {
+        // 카메라의 앞 방향 벡터 계산 (타겟 방향)
+        Vector3 forward;
+        forward.subVectors(target, pimpl_->camera.position);
+        forward.normalize();
+
+        // 카메라와 타겟을 같은 방향으로 이동
+        Vector3 movement;
+        movement.copy(forward).multiplyScalar(distance);
+
+        pimpl_->camera.position.add(movement);
+        target.add(movement);
+
+        update();
+    }
+}

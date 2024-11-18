@@ -582,7 +582,7 @@ void OrbitControls::updateFromMouseInput(float deltaX, float deltaY, float wheel
         }
         else if (isCtrlDown) {
             // Ctrl + 휠클릭 드래그 = Zoom
-            moveForward(-deltaY * 0.01f);
+            zoomCamera(-deltaY * 0.01f);
         }
         else {
             // 휠클릭 드래그 = Rotate

@@ -78,6 +78,10 @@ namespace threepp {
 
     // Custom code by jusik
     public:
+        float moveSpeed = 0.1f;
+
+        void moveOnPlane(char direction);
+
         void moveForward(float distance);
 
         // Rotate camera based on mouse drag
@@ -89,8 +93,12 @@ namespace threepp {
         // Pan camera based on mouse drag
         void panCamera(float deltaX, float deltaY);
 
+        void handleWASDMovement(bool isWPressed, bool isSPressed, bool isAPressed, bool isDPressed);
+
         // Update camera based on mouse input
-        void updateFromMouseInput(float deltaX, float deltaY, float wheelDelta, bool isLeftMouseDown, bool isShiftDown, bool isCtrlDown);
+        void updateFromMouseInput(float deltaX, float deltaY, float wheelDelta,
+                            bool isMiddleMouseDown, bool isShiftDown, bool isCtrlDown,
+                            bool isWPressed, bool isSPressed, bool isAPressed, bool isDPressed);
     };
 
 }// namespace threepp

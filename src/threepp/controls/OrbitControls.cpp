@@ -571,7 +571,10 @@ void OrbitControls::panCamera(float deltaX, float deltaY) {
 }
 
 // Update camera based on mouse input
-void OrbitControls::updateFromMouseInput(float deltaX, float deltaY, float wheelDelta, bool isMiddleMouseDown, bool isShiftDown, bool isCtrlDown) {
+void OrbitControls::updateFromMouseInput(float deltaX, float deltaY, float wheelDelta,
+                                       bool isMiddleMouseDown, bool isShiftDown, bool isCtrlDown,
+                                       bool isWPressed, bool isSPressed, bool isAPressed, bool isDPressed) {
+    // 기존 마우스 컨트롤 처리
     if (isMiddleMouseDown) {
         if (isShiftDown) {
             // Shift + 휠클릭 드래그 = Pan
@@ -579,7 +582,7 @@ void OrbitControls::updateFromMouseInput(float deltaX, float deltaY, float wheel
         }
         else if (isCtrlDown) {
             // Ctrl + 휠클릭 드래그 = Zoom
-            moveForward(-deltaY * 0.01);
+            moveForward(-deltaY * 0.01f);
         }
         else {
             // 휠클릭 드래그 = Rotate
@@ -587,10 +590,13 @@ void OrbitControls::updateFromMouseInput(float deltaX, float deltaY, float wheel
         }
     }
 
-    // 일반 휠 스크롤로도 줌 가능
+    // 휠 스크롤 처리
     if (wheelDelta != 0.0f) {
         zoomCamera(-wheelDelta * 0.1f);
     }
+
+    // WASD 이동 처리
+    handleWASDMovement(isWPressed, isSPressed, isAPressed, isDPressed);
 }
 
 void OrbitControls::moveForward(float distance) {
@@ -607,6 +613,79 @@ void OrbitControls::moveForward(float distance) {
         pimpl_->camera.position.add(movement);
         target.add(movement);
 
+        update();
+    }
+}
+
+void OrbitControls::moveOnPlane(char direction) {
+    if (!enabled) return;
+
+    Vector3 movement;
+    float delta = moveSpeed;
+
+    // Get the forward and right vectors in the XZ plane
+    Vector3 forward;
+    forward.subVectors(target, pimpl_->camera.position);
+    forward.y = 0;  // Project onto XZ plane
+    forward.normalize();
+
+    Vector3 right;
+    right.crossVectors(Vector3(0, 1, 0), forward);
+    right.normalize();
+
+    switch (direction) {
+        case 'W':
+            movement.copy(forward).multiplyScalar(delta);
+        break;
+        case 'S':
+            movement.copy(forward).multiplyScalar(-delta);
+        break;
+        case 'D':
+            movement.copy(right).multiplyScalar(delta);
+        break;
+        case 'A':
+            movement.copy(right).multiplyScalar(-delta);
+        break;
+    }
+
+    // Move both camera and target to maintain the same view direction
+    pimpl_->camera.position.add(movement);
+    target.add(movement);
+
+    update();
+}
+
+
+void OrbitControls::handleWASDMovement(bool isWPressed, bool isSPressed, bool isAPressed, bool isDPressed) {
+    if (!enabled) return;
+
+    // 카메라의 전방 벡터 계산 (z 컴포넌트는 0으로 하여 X-Y 평면상의 이동만 처리)
+    Vector3 forward;
+    forward.subVectors(target, pimpl_->camera.position);
+    forward.z = 0;  // X-Y 평면에 투영
+    forward.normalize();
+
+    // 오른쪽 벡터 계산 (Z가 up이므로 (0,0,1)과 외적)
+    Vector3 right;
+    right.crossVectors(forward ,Vector3(0, 0, 1));
+    right.normalize();
+
+    Vector3 movement;
+
+    // 각 방향키에 대한 이동 벡터 계산
+    if (isWPressed) movement.add(forward);
+    if (isSPressed) movement.sub(forward);
+    if (isDPressed) movement.add(right);
+    if (isAPressed) movement.sub(right);
+
+    // 정규화하고 속도 적용
+    if (movement.length() > 0) {
+        movement.normalize();
+        movement.multiplyScalar(moveSpeed);
+
+        // 카메라와 타겟 모두 이동 (X-Y 평면상에서만)
+        pimpl_->camera.position.add(movement);
+        target.add(movement);
         update();
     }
 }

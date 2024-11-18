@@ -78,7 +78,7 @@ namespace threepp {
 
     // Custom code by jusik
     public:
-        float moveSpeed = 0.1f;
+        float moveSpeed = 0.031415f;
 
         void moveOnPlane(char direction);
 

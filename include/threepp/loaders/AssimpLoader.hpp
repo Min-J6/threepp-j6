@@ -82,7 +82,7 @@ namespace threepp {
                 const auto aiMesh = aiScene->mMeshes[meshIndex];
 
                 auto geometry = BufferGeometry::create();
-                auto material = MeshToonMaterial::create();
+                auto material = MeshStandardMaterial::create();
                 setupMaterial(info.path, aiScene, aiMesh, *material);
 
                 std::shared_ptr<Mesh> mesh;
@@ -352,7 +352,7 @@ namespace threepp {
             }
         }
 
-        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshToonMaterial& material) {
+        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshStandardMaterial& material) {
             if (aiScene->HasMaterials()) {
                 aiString p;
                 auto mi = aiMesh->mMaterialIndex;
@@ -403,25 +403,25 @@ namespace threepp {
                 }
 
                 // no use for toon material
-                // // roughness map
-                // if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
-                //     if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE_ROUGHNESS, 0, &p) == aiReturn_SUCCESS) {
-                //         auto tex = loadTexture(aiScene, path, p.C_Str());
-                //         material.roughnessMap = tex;
-                //
-                //         handleWrapping(mat, aiTextureType_DIFFUSE_ROUGHNESS, *tex);
-                //     }
-                // }
-                //
-                // // metalness map
-                // if (aiGetMaterialTextureCount(mat, aiTextureType_METALNESS) > 0) {
-                //     if (aiGetMaterialTexture(mat, aiTextureType_METALNESS, 0, &p) == aiReturn_SUCCESS) {
-                //         auto tex = loadTexture(aiScene, path, p.C_Str());
-                //         material.metalnessMap = tex;
-                //
-                //         handleWrapping(mat, aiTextureType_METALNESS, *tex);
-                //     }
-                // }
+                 // roughness map
+                 if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
+                     if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE_ROUGHNESS, 0, &p) == aiReturn_SUCCESS) {
+                         auto tex = loadTexture(aiScene, path, p.C_Str());
+                         material.roughnessMap = tex;
+
+                         handleWrapping(mat, aiTextureType_DIFFUSE_ROUGHNESS, *tex);
+                     }
+                 }
+
+                 // metalness map
+                 if (aiGetMaterialTextureCount(mat, aiTextureType_METALNESS) > 0) {
+                     if (aiGetMaterialTexture(mat, aiTextureType_METALNESS, 0, &p) == aiReturn_SUCCESS) {
+                         auto tex = loadTexture(aiScene, path, p.C_Str());
+                         material.metalnessMap = tex;
+
+                         handleWrapping(mat, aiTextureType_METALNESS, *tex);
+                     }
+                 }
 
                 // // ?
                 //                  if (aiGetMaterialTextureCount(mat, aiTextureType_SPECULAR) > 0) {

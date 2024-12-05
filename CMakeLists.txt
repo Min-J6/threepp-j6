@@ -10,6 +10,7 @@ option(THREEPP_BUILD_TESTS "Build test suite" OFF)
 option(THREEPP_WITH_SVG "Build with SVGLoader" ON)
 option(THREEPP_WITH_AUDIO "Build with Audio" ON)
 option(THREEPP_TREAT_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+option(THREEPP_WITH_IMGUI "Build with ImGui support" ON)
 
 # Force THREEPP_WITH_GLFW ON when targeting Emscripten
 cmake_dependent_option(THREEPP_WITH_GLFW "Build with GLFW frontend" ON "NOT DEFINED EMSCRIPTEN" ON)
@@ -19,7 +20,6 @@ cmake_dependent_option(THREEPP_USE_EXTERNAL_GLFW "Use externally supplied GLFW" 
 cmake_dependent_option(THREEPP_EMBEDDED_GLFW_WITH_X11 "Build GLFW with X11 support" ON "NOT THREEPP_USE_EXTERNAL_GLFW;UNIX;NOT APPLE" ON)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-
 
 # ==============================================================================
 # Global internal configuration
@@ -32,29 +32,29 @@ include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-
+set(THREEPP_WITH_GLFW ON CACHE BOOL "" FORCE)
+set(THREEPP_USE_EXTERNAL_GLFW ON CACHE BOOL "" FORCE)
 
 # ==============================================================================
 # Dependencies
 # ==============================================================================
-
 
 if (DEFINED EMSCRIPTEN)
     if ("${CMAKE_SYSTEM}" MATCHES "Linux" OR "${CMAKE_SYSTEM}" MATCHES "Darwin-*")
         find_package(OpenGL REQUIRED)
     endif ()
 else ()
-
     if (THREEPP_USE_EXTERNAL_GLFW)
-        # find_package(glfw3 CONFIG REQUIRED)
-
         if (NOT TARGET "glfw::glfw" AND TARGET "glfw")
             add_library(glfw::glfw ALIAS glfw)
         endif ()
     endif ()
-
 endif ()
 
+# Add ImGui
+if(THREEPP_WITH_IMGUI)
+    add_subdirectory(ImGui)
+endif()
 
 # ==============================================================================
 # Targets
@@ -67,7 +67,6 @@ if (THREEPP_BUILD_EXAMPLES)
 endif ()
 
 if (NOT DEFINED EMSCRIPTEN AND THREEPP_BUILD_TESTS)
-
     include(FetchContent)
     FetchContent_Declare(
             Catch2
@@ -80,6 +79,13 @@ if (NOT DEFINED EMSCRIPTEN AND THREEPP_BUILD_TESTS)
     add_subdirectory(tests)
 endif ()
 
+# ==============================================================================
+# Link ImGui to threepp target
+# ==============================================================================
+
+if(THREEPP_WITH_IMGUI)
+    target_link_libraries(threepp PUBLIC ImGui)
+endif()
 
 # ==============================================================================
 # Application resources
@@ -92,7 +98,6 @@ if (NOT DEFINED EMSCRIPTEN)
     file(COPY "${CMAKE_CURRENT_LIST_DIR}/data/fonts" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/data)
     file(COPY "${CMAKE_CURRENT_LIST_DIR}/data/sounds" DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/data)
 endif ()
-
 
 # ==============================================================================
 # Exports and remaining installation
@@ -114,7 +119,7 @@ install(
         DESTINATION
         ${CMAKE_INSTALL_DATADIR}/threepp)
 
-install(TARGETS threepp EXPORT threepp-targets)
+install(TARGETS threepp ImGui EXPORT threepp-targets)
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT threepp-targets
         NAMESPACE threepp::

@@ -19,7 +19,7 @@ namespace threepp {
 
     protected:
         DirectionalLightShadow()
-            : LightShadow(std::make_unique<OrthographicCamera>(-5.f, 5.f, 5.f, -5.f, 0.5f, 500.f)) {}
+            : LightShadow(std::make_unique<OrthographicCamera>(-50.f, 50.f, 50.f, -50.f, 0.5f, 500.f)) {}
     };
 
 }// namespace threepp

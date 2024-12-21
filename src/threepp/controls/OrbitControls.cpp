@@ -667,25 +667,40 @@ void OrbitControls::handleWASDMovement(bool isWPressed, bool isSPressed, bool is
 
     // 오른쪽 벡터 계산 (Z가 up이므로 (0,0,1)과 외적)
     Vector3 right;
-    right.crossVectors(forward ,Vector3(0, 0, 1));
+    right.crossVectors(forward, Vector3(0, 0, 1));
     right.normalize();
 
-    Vector3 movement;
+    // 목표 이동 방향 계산
+    Vector3 targetDirection;
 
-    // 각 방향키에 대한 이동 벡터 계산
-    if (isWPressed) movement.add(forward);
-    if (isSPressed) movement.sub(forward);
-    if (isDPressed) movement.add(right);
-    if (isAPressed) movement.sub(right);
+    if (isWPressed) targetDirection.add(forward);
+    if (isSPressed) targetDirection.sub(forward);
+    if (isDPressed) targetDirection.add(right);
+    if (isAPressed) targetDirection.sub(right);
 
-    // 정규화하고 속도 적용
-    if (movement.length() > 0) {
-        movement.normalize();
-        movement.multiplyScalar(moveSpeed);
+    // 만약 이동 입력이 있다면
+    if (targetDirection.length() > 0) {
+        // 이동 방향 정규화하고 속도 적용
+        targetDirection.normalize();
+        targetDirection.multiplyScalar(moveSpeed);
 
-        // 카메라와 타겟 모두 이동 (X-Y 평면상에서만)
-        pimpl_->camera.position.add(movement);
-        target.add(movement);
+        // 현재 속도를 목표 방향으로 부드럽게 보간
+        currentVelocity.lerp(targetDirection, acceleration * deltaTime);
+    } else {
+        // 입력이 없으면 감속
+        currentVelocity.multiplyScalar(1.0f - deceleration * deltaTime);
+    }
+
+    // 매우 작은 속도는 0으로 만들어 미세한 움직임 방지
+    if (currentVelocity.length() < 0.0001f) {
+        currentVelocity.set(0, 0, 0);
+    }
+
+    // 현재 속도로 이동
+    if (currentVelocity.length() > 0) {
+        // 카메라와 타겟 모두 이동
+        pimpl_->camera.position.add(currentVelocity);
+        target.add(currentVelocity);
         update();
     }
 }

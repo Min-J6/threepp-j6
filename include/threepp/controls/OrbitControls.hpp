@@ -78,7 +78,16 @@ namespace threepp {
 
     // Custom code by jusik
     public:
+        // Movement properties
         float moveSpeed = 0.031415f;
+        float acceleration = 1.0f;     // How quickly to reach target speed
+        float deceleration = 20.0f;     // How quickly to slow down
+        float maxSpeed = 1.f;        // Maximum movement speed
+
+        // Current velocity for smooth movement
+        Vector3 currentVelocity{0, 0, 0};
+        Vector3 targetVelocity{0, 0, 0};
+        float deltaTime = 0.016f;      // Assume 60fps, adjust as needed
 
         void moveOnPlane(char direction);
 

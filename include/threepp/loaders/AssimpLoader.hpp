@@ -82,7 +82,7 @@ namespace threepp {
                 const auto aiMesh = aiScene->mMeshes[meshIndex];
 
                 auto geometry = BufferGeometry::create();
-                auto material = MeshStandardMaterial::create();
+                auto material = MeshToonMaterial::create();
                 setupMaterial(info.path, aiScene, aiMesh, *material);
 
                 std::shared_ptr<Mesh> mesh;
@@ -107,6 +107,7 @@ namespace threepp {
 
                 auto name_ = std::filesystem::path(info.path).stem().string();
                 mesh->name = aiMesh->mName.C_Str();
+                mesh->frustumCulled = false;
                 if (mesh->name.empty()) {
                     mesh->name = name_ + "_" + "mesh";
                 }
@@ -136,8 +137,8 @@ namespace threepp {
                         const auto texCoord = aiMesh->HasTextureCoords(0) ? aiMesh->mTextureCoords[0][j] : Zero3D;
                         if (aiMesh->HasVertexColors(0)) {
                             const auto color = aiMesh->mColors[0][j];
-                            colors.insert(colors.end(), {color.r, color.g, color.b, color.a});
-                            // colors.insert(colors.end(), {1.0f, 1.0f, 1.0f, 1.0f});
+                            // colors.insert(colors.end(), {color.r, color.g, color.b, color.a});
+                            colors.insert(colors.end(), {1.0f, 1.0f, 1.0f, 1.0f});
                         }
 
                         for (auto k = 0; k < aiMesh->mNumAnimMeshes; k++) {
@@ -353,7 +354,7 @@ namespace threepp {
             }
         }
 
-        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshStandardMaterial& material) {
+        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshToonMaterial& material) {
             if (!aiScene->HasMaterials()) return;
 
             auto mi = aiMesh->mMaterialIndex;
@@ -385,31 +386,36 @@ namespace threepp {
                 }
             }
 
-            // 2. Metalness
-            if (aiGetMaterialTextureCount(mat, aiTextureType_METALNESS) > 0) {
-                if (aiGetMaterialTexture(mat, aiTextureType_METALNESS, 0, &p) == aiReturn_SUCCESS) {
-                    auto tex = loadTexture(aiScene, path, p.C_Str());
-                    material.metalnessMap = tex;
-                    handleWrapping(mat, aiTextureType_METALNESS, *tex);
-                }
-            }
-            float metallicFactor;
-            if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_METALLIC_FACTOR, &metallicFactor)) {
-                material.metalness = metallicFactor;
-            }
 
-            // 3. Roughness
-            if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
-                if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE_ROUGHNESS, 0, &p) == aiReturn_SUCCESS) {
-                    auto tex = loadTexture(aiScene, path, p.C_Str());
-                    material.roughnessMap = tex;
-                    handleWrapping(mat, aiTextureType_DIFFUSE_ROUGHNESS, *tex);
-                }
-            }
-            float roughnessFactor;
-            if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_ROUGHNESS_FACTOR, &roughnessFactor)) {
-                material.roughness = roughnessFactor;
-            }
+            // No use this (Toon Materials)
+            // {
+            //     // 2. Metalness
+            //     if (aiGetMaterialTextureCount(mat, aiTextureType_METALNESS) > 0) {
+            //         if (aiGetMaterialTexture(mat, aiTextureType_METALNESS, 0, &p) == aiReturn_SUCCESS) {
+            //             auto tex = loadTexture(aiScene, path, p.C_Str());
+            //             material.metalnessMap = tex;
+            //             handleWrapping(mat, aiTextureType_METALNESS, *tex);
+            //         }
+            //     }
+            //     float metallicFactor;
+            //     if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_METALLIC_FACTOR, &metallicFactor)) {
+            //         material.metalness = metallicFactor;
+            //     }
+            //
+            //     // 3. Roughness
+            //     if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
+            //         if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE_ROUGHNESS, 0, &p) == aiReturn_SUCCESS) {
+            //             auto tex = loadTexture(aiScene, path, p.C_Str());
+            //             material.roughnessMap = tex;
+            //             handleWrapping(mat, aiTextureType_DIFFUSE_ROUGHNESS, *tex);
+            //         }
+            //     }
+            //     float roughnessFactor;
+            //     if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_ROUGHNESS_FACTOR, &roughnessFactor)) {
+            //         material.roughness = roughnessFactor;
+            //     }
+            // }
+
 
             // 4. Normal Maps
             if (aiGetMaterialTextureCount(mat, aiTextureType_NORMALS) > 0) {

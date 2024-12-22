@@ -25,7 +25,7 @@ namespace threepp {
 
     public:
         std::shared_ptr<Group> load(const std::filesystem::path& path) override {
-
+            // aiProcessPreset_TargetRealtime_Quality aiProcessPreset_TargetRealtime_Fast
             auto aiScene = importer_.ReadFile(path.string().c_str(), aiProcessPreset_TargetRealtime_Quality);
 
             if (!aiScene) {
@@ -82,7 +82,7 @@ namespace threepp {
                 const auto aiMesh = aiScene->mMeshes[meshIndex];
 
                 auto geometry = BufferGeometry::create();
-                auto material = MeshToonMaterial::create();
+                auto material = MeshStandardMaterial::create();
                 setupMaterial(info.path, aiScene, aiMesh, *material);
 
                 std::shared_ptr<Mesh> mesh;
@@ -136,7 +136,8 @@ namespace threepp {
                         const auto texCoord = aiMesh->HasTextureCoords(0) ? aiMesh->mTextureCoords[0][j] : Zero3D;
                         if (aiMesh->HasVertexColors(0)) {
                             const auto color = aiMesh->mColors[0][j];
-                            colors.insert(colors.end(), {color.r, color.g, color.b, color.a});
+                            // colors.insert(colors.end(), {color.r, color.g, color.b, color.a});
+                            colors.insert(colors.end(), {1.0f, 1.0f, 1.0f, 1.0f});
                         }
 
                         for (auto k = 0; k < aiMesh->mNumAnimMeshes; k++) {
@@ -352,112 +353,126 @@ namespace threepp {
             }
         }
 
-        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshToonMaterial& material) {
-            if (aiScene->HasMaterials()) {
-                aiString p;
-                auto mi = aiMesh->mMaterialIndex;
-                auto mat = aiScene->mMaterials[mi];
+        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshStandardMaterial& material) {
+            if (!aiScene->HasMaterials()) return;
 
-                if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE) > 0) {
-                    if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE, 0, &p) == aiReturn_SUCCESS) {
-                        auto tex = loadTexture(aiScene, path, p.C_Str());
-                        material.map = tex;
+            auto mi = aiMesh->mMaterialIndex;
+            auto mat = aiScene->mMaterials[mi];
+            aiString p;
 
-                        handleWrapping(mat, aiTextureType_DIFFUSE, *tex);
-                    }
-                } else {
-                    C_STRUCT aiColor4D diffuse;
-                    if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse)) {
-                        material.color.setRGB(diffuse.r, diffuse.g, diffuse.b);
-                    }
+            // 기본 material 속성 설정
+            material.metalness = 0.6f;
+            material.roughness = 0.6f;
+
+            // PBR Materials
+            // 1. Base Color / Diffuse
+            if (aiGetMaterialTextureCount(mat, aiTextureType_BASE_COLOR) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_BASE_COLOR, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.map = tex;
+                    handleWrapping(mat, aiTextureType_BASE_COLOR, *tex);
                 }
-
-                // light map
-                if (aiGetMaterialTextureCount(mat, aiTextureType_EMISSIVE) > 0) {
-                    if (aiGetMaterialTexture(mat, aiTextureType_EMISSIVE, 0, &p) == aiReturn_SUCCESS) {
-                        auto tex = loadTexture(aiScene, path, p.C_Str());
-                        material.emissiveMap = tex;
-
-                        handleWrapping(mat, aiTextureType_EMISSIVE, *tex);
-                    }
-                } else {
-                    C_STRUCT aiColor4D emissive;
-                    if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_EMISSIVE, &emissive)) {
-                        material.emissive.setRGB(emissive.r, emissive.g, emissive.b);
-                    }
+            } else if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.map = tex;
+                    handleWrapping(mat, aiTextureType_DIFFUSE, *tex);
                 }
-
-                // float emmisiveIntensity;
-                // if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_EMISSIVE_INTENSITY, &emmisiveIntensity)) {
-                //     material.emissiveIntensity = emmisiveIntensity;
-                // }
-                //
-                // // normal map
-                // if (aiGetMaterialTextureCount(mat, aiTextureType_NORMALS) > 0) {
-                //     if (aiGetMaterialTexture(mat, aiTextureType_NORMALS, 0, &p) == aiReturn_SUCCESS) {
-                //         auto tex = loadTexture(aiScene, path, p.C_Str());
-                //         material.normalMap = tex;
-                //
-                //         handleWrapping(mat, aiTextureType_NORMALS, *tex);
-                //     }
-                // }
-
-                // no use for toon material
-                // roughness map
-                // if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
-                //     if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE_ROUGHNESS, 0, &p) == aiReturn_SUCCESS) {
-                //         auto tex = loadTexture(aiScene, path, p.C_Str());
-                //         material.roughnessMap = tex;
-                //
-                //         handleWrapping(mat, aiTextureType_DIFFUSE_ROUGHNESS, *tex);
-                //     }
-                // }
-                //
-                // // metalness map
-                // if (aiGetMaterialTextureCount(mat, aiTextureType_METALNESS) > 0) {
-                //     if (aiGetMaterialTexture(mat, aiTextureType_METALNESS, 0, &p) == aiReturn_SUCCESS) {
-                //         auto tex = loadTexture(aiScene, path, p.C_Str());
-                //         material.metalnessMap = tex;
-                //
-                //         handleWrapping(mat, aiTextureType_METALNESS, *tex);
-                //     }
-                // }
-
-                // // ?
-                //                  if (aiGetMaterialTextureCount(mat, aiTextureType_SPECULAR) > 0) {
-                //                      if (aiGetMaterialTexture(mat, aiTextureType_SPECULAR, 0, &p) == aiReturn_SUCCESS) {
-                //                          auto tex = loadTexture(aiScene, path, p.C_Str());
-                //                          material.specularMap = tex;
-                //                      }
-                //                  } else {
-                //                      C_STRUCT aiColor4D specular;
-                //                      if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_SPECULAR, &specular)) {
-                //                          material.specular.setRGB(specular.r, specular.g, specular.b);
-                //                      }
-                //                  }
-                //
-                //                  float shininess;
-                //                  if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_SHININESS, &shininess)) {
-                //                      material.shininess = shininess;
-                //                  }
-
-
-                // should this be added?
-                //                C_STRUCT aiColor4D ambient;
-                //                if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_AMBIENT, &ambient)) {
-                //                    material.color.add(Color().setRGB(ambient.r, ambient.g, ambient.b));
-                //                }
-                //
-                //                if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_BASE_COLOR, &ambient)) {
-                //                    material.color.setRGB(ambient.r, ambient.g, ambient.b);
-                //                }
-
-                float opacity;
-                if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_OPACITY, &opacity)) {
-                    material.transparent = true;
-                    material.opacity = opacity;
+            } else {
+                C_STRUCT aiColor4D diffuse;
+                if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &diffuse)) {
+                    material.color.setRGB(diffuse.r, diffuse.g, diffuse.b);
                 }
             }
+
+            // 2. Metalness
+            if (aiGetMaterialTextureCount(mat, aiTextureType_METALNESS) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_METALNESS, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.metalnessMap = tex;
+                    handleWrapping(mat, aiTextureType_METALNESS, *tex);
+                }
+            }
+            float metallicFactor;
+            if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_METALLIC_FACTOR, &metallicFactor)) {
+                material.metalness = metallicFactor;
+            }
+
+            // 3. Roughness
+            if (aiGetMaterialTextureCount(mat, aiTextureType_DIFFUSE_ROUGHNESS) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_DIFFUSE_ROUGHNESS, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.roughnessMap = tex;
+                    handleWrapping(mat, aiTextureType_DIFFUSE_ROUGHNESS, *tex);
+                }
+            }
+            float roughnessFactor;
+            if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_ROUGHNESS_FACTOR, &roughnessFactor)) {
+                material.roughness = roughnessFactor;
+            }
+
+            // 4. Normal Maps
+            if (aiGetMaterialTextureCount(mat, aiTextureType_NORMALS) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_NORMALS, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.normalMap = tex;
+                    handleWrapping(mat, aiTextureType_NORMALS, *tex);
+                }
+            }
+
+            // 5. Emission
+            if (aiGetMaterialTextureCount(mat, aiTextureType_EMISSIVE) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_EMISSIVE, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.emissiveMap = tex;
+                    handleWrapping(mat, aiTextureType_EMISSIVE, *tex);
+                }
+            } else {
+                C_STRUCT aiColor4D emissive;
+                if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_EMISSIVE, &emissive)) {
+                    material.emissive.setRGB(emissive.r, emissive.g, emissive.b);
+                }
+            }
+            float emissiveIntensity;
+            if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_EMISSIVE_INTENSITY, &emissiveIntensity)) {
+                material.emissiveIntensity = emissiveIntensity;
+            }
+
+            // 6. Ambient Occlusion
+            if (aiGetMaterialTextureCount(mat, aiTextureType_AMBIENT_OCCLUSION) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_AMBIENT_OCCLUSION, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.aoMap = tex;
+                    handleWrapping(mat, aiTextureType_AMBIENT_OCCLUSION, *tex);
+                }
+            }
+
+            // 7. Height/Displacement
+            if (aiGetMaterialTextureCount(mat, aiTextureType_HEIGHT) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_HEIGHT, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.displacementMap = tex;
+                    handleWrapping(mat, aiTextureType_HEIGHT, *tex);
+                }
+            }
+
+
+            // 10. Opacity
+            if (aiGetMaterialTextureCount(mat, aiTextureType_OPACITY) > 0) {
+                if (aiGetMaterialTexture(mat, aiTextureType_OPACITY, 0, &p) == aiReturn_SUCCESS) {
+                    auto tex = loadTexture(aiScene, path, p.C_Str());
+                    material.alphaMap = tex;
+                    handleWrapping(mat, aiTextureType_OPACITY, *tex);
+                }
+            }
+            float opacity;
+            if (AI_SUCCESS == aiGetMaterialFloat(mat, AI_MATKEY_OPACITY, &opacity)) {
+                material.opacity = opacity;
+                if (opacity < 1.0f) {
+                    material.transparent = true;
+                }
+            }
+
         }
 
         std::shared_ptr<Texture> loadTexture(const aiScene* aiScene, const std::filesystem::path& path, const std::string& name) {

@@ -136,8 +136,8 @@ namespace threepp {
                         const auto texCoord = aiMesh->HasTextureCoords(0) ? aiMesh->mTextureCoords[0][j] : Zero3D;
                         if (aiMesh->HasVertexColors(0)) {
                             const auto color = aiMesh->mColors[0][j];
-                            // colors.insert(colors.end(), {color.r, color.g, color.b, color.a});
-                            colors.insert(colors.end(), {1.0f, 1.0f, 1.0f, 1.0f});
+                            colors.insert(colors.end(), {color.r, color.g, color.b, color.a});
+                            // colors.insert(colors.end(), {1.0f, 1.0f, 1.0f, 1.0f});
                         }
 
                         for (auto k = 0; k < aiMesh->mNumAnimMeshes; k++) {
@@ -361,8 +361,8 @@ namespace threepp {
             aiString p;
 
             // 기본 material 속성 설정
-            material.metalness = 0.6f;
-            material.roughness = 0.6f;
+            // material.metalness = 0.6f;
+            // material.roughness = 0.6f;
 
             // PBR Materials
             // 1. Base Color / Diffuse
@@ -425,12 +425,9 @@ namespace threepp {
                 if (aiGetMaterialTexture(mat, aiTextureType_EMISSIVE, 0, &p) == aiReturn_SUCCESS) {
                     auto tex = loadTexture(aiScene, path, p.C_Str());
                     material.emissiveMap = tex;
+                    material.emissive.setRGB(1, 1, 1); // 이미시브 색상을 흰색으로 설정
+                    material.emissiveIntensity = 1.0;  // 이미시브 강도를 1.0으로 설정
                     handleWrapping(mat, aiTextureType_EMISSIVE, *tex);
-                }
-            } else {
-                C_STRUCT aiColor4D emissive;
-                if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_EMISSIVE, &emissive)) {
-                    material.emissive.setRGB(emissive.r, emissive.g, emissive.b);
                 }
             }
             float emissiveIntensity;

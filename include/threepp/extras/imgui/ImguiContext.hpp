@@ -173,7 +173,9 @@ public:
         ImGuiIO& io = ImGui::GetIO();
         // Add font RobotoMedium
         float sizePixels = 26.0f;
-        ImFont* fontRobotoMedium = io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoMedium_compressed_data, RobotoMedium_compressed_size, sizePixels);
+        //ImFont* fontRobotoMedium = io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoMedium_compressed_data, RobotoMedium_compressed_size, sizePixels);
+        ImFont* fontRobotoMedium = io.Fonts->AddFontFromFileTTF("resource/Fonts/NanumGothic.ttf", sizePixels, NULL, io.Fonts->GetGlyphRangesKorean());
+		//io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoMedium_compressed_data, RobotoMedium_compressed_size, sizePixels);
         IM_ASSERT(fontRobotoMedium != nullptr);
 
         // Merge icons to font RobotoMedium

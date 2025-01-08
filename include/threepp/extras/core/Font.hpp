@@ -34,7 +34,7 @@ namespace threepp {
         int lineHeight{};
         int underlineThickness{};
 
-        std::unordered_map<char, Glyph> glyphs;
+        std::unordered_map<char32_t, Glyph> glyphs;
 
         [[nodiscard]] std::vector<Shape> generateShapes(const std::string& text, float size = 100) const;
     };

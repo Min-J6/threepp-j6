@@ -17,8 +17,6 @@ namespace {
     };
 
     FontPath createPath(char32_t c, float scale, float offsetX, float offsetY, const Font& data) {
-        std::cout << "Character code: " << std::hex << static_cast<int>(c) << std::endl;
-        std::cout << "Glyph exists: " << (data.glyphs.contains(c) ? "yes" : "no") << std::endl;
 
         const auto glyph = data.glyphs.contains(c) ? data.glyphs.at(c) : data.glyphs.at('?');
 

@@ -21,11 +21,11 @@
 
 namespace ImGui {
     ImFont* Medium36;
-    ImFont* Medium46;
+    ImFont* Medium50;
 
     ImFont* Bold26;
     ImFont* Bold36;
-    ImFont* Bold46;
+    ImFont* Bold50;
 
 }
 
@@ -201,15 +201,15 @@ public:
         // 폰트 불러오기
         ImGui::Medium36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
         IM_ASSERT(ImGui::Medium36 != nullptr);
-        ImGui::Medium46 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
-        IM_ASSERT(ImGui::Medium46 != nullptr);
+        ImGui::Medium50 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Medium50 != nullptr);
 
         ImGui::Bold26 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 26, NULL, io.Fonts->GetGlyphRangesKorean());
         IM_ASSERT(ImGui::Bold26 != nullptr);
         ImGui::Bold36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
         IM_ASSERT(ImGui::Bold36 != nullptr);
-        ImGui::Bold46 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
-        IM_ASSERT(ImGui::Bold46 != nullptr);
+        ImGui::Bold50 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Bold50 != nullptr);
 
 
 

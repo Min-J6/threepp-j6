@@ -19,6 +19,16 @@
 #include "RobotoMedium.cpp"
 #include "MaterialIcons.cpp"
 
+namespace ImGui {
+    ImFont* Medium36;
+    ImFont* Medium46;
+
+    ImFont* Bold26;
+    ImFont* Bold36;
+    ImFont* Bold46;
+
+}
+
 class ImguiContext {
 
 public:
@@ -174,7 +184,7 @@ public:
         // Add font RobotoMedium
         float sizePixels = 26.0f;
         //ImFont* fontRobotoMedium = io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoMedium_compressed_data, RobotoMedium_compressed_size, sizePixels);
-        ImFont* fontRobotoMedium = io.Fonts->AddFontFromFileTTF("resource/Fonts/NanumGothic.ttf", sizePixels, NULL, io.Fonts->GetGlyphRangesKorean());
+        ImFont* fontRobotoMedium = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", sizePixels, NULL, io.Fonts->GetGlyphRangesKorean());
 		//io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoMedium_compressed_data, RobotoMedium_compressed_size, sizePixels);
         IM_ASSERT(fontRobotoMedium != nullptr);
 
@@ -186,6 +196,24 @@ public:
         static const ImWchar ranges[] = { 0xe000, 0xf3ff, 0 };
         ImFont* fontMaterialIcons = io.Fonts->AddFontFromMemoryCompressedTTF(&MaterialIcons_compressed_data, MaterialIcons_compressed_size, sizePixels, &config, ranges);
         IM_ASSERT(fontMaterialIcons != nullptr);
+
+
+        // 폰트 불러오기
+        ImGui::Medium36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Medium36 != nullptr);
+        ImGui::Medium46 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Medium46 != nullptr);
+
+        ImGui::Bold26 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 26, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Bold26 != nullptr);
+        ImGui::Bold36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Bold36 != nullptr);
+        ImGui::Bold46 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Bold46 != nullptr);
+
+
+
+
 
         // Add font RobotoRegular
         // ImFont* fontRobotoRegular = io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoRegular_compressed_data, RobotoRegular_compressed_size, sizePixels);

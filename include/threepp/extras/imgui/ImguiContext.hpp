@@ -212,6 +212,11 @@ public:
         IM_ASSERT(ImGui::Bold50 != nullptr);
 
 
+        ImPlotStyle& plotStyle = ImPlot::GetStyle();
+        ImVec4* implotColors = plotStyle.Colors;
+
+        implotColors[ImPlotCol_FrameBg] = ImVec4(0.11f, 0.12f, 0.13f, 1.00f); // Background
+        implotColors[ImPlotCol_PlotBg]  = ImVec4(0.13f, 0.14f, 0.15f, 1.00f); // 자식 창 배경
 
 
 

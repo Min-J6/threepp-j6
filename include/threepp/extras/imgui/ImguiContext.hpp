@@ -20,12 +20,12 @@
 #include "MaterialIcons.cpp"
 
 namespace ImGui {
-    ImFont* Medium36;
-    ImFont* Medium50;
+    inline ImFont* Medium36;
+    inline ImFont* Medium50;
 
-    ImFont* Bold26;
-    ImFont* Bold36;
-    ImFont* Bold50;
+    inline ImFont* Bold26;
+    inline ImFont* Bold36;
+    inline ImFont* Bold50;
 
 }
 

@@ -82,7 +82,7 @@ namespace threepp {
                 const auto aiMesh = aiScene->mMeshes[meshIndex];
 
                 auto geometry = BufferGeometry::create();
-                auto material = MeshToonMaterial::create();
+                auto material = MeshStandardMaterial::create();
                 setupMaterial(info.path, aiScene, aiMesh, *material);
 
                 std::shared_ptr<Mesh> mesh;
@@ -354,7 +354,7 @@ namespace threepp {
             }
         }
 
-        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshToonMaterial& material) {
+        void setupMaterial(const std::filesystem::path& path, const aiScene* aiScene, const aiMesh* aiMesh, MeshStandardMaterial& material) {
             if (!aiScene->HasMaterials()) return;
 
             auto mi = aiMesh->mMaterialIndex;
@@ -362,8 +362,8 @@ namespace threepp {
             aiString p;
 
             // 기본 material 속성 설정
-            // material.metalness = 0.6f;
-            // material.roughness = 0.6f;
+            material.metalness = 0.5f;
+            material.roughness = 0.25f;
 
             // PBR Materials
             // 1. Base Color / Diffuse

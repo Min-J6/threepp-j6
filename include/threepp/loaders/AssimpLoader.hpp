@@ -490,7 +490,7 @@ namespace threepp {
             // Base/Diffuse Color Values
             aiColor4D color;
             if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_BASE_COLOR, &color)) {
-                material.color.setRGB(color.r, color.g, color.b);
+                // material.color.setRGB(1, 1, 1);
             } else if (AI_SUCCESS == aiGetMaterialColor(mat, AI_MATKEY_COLOR_DIFFUSE, &color)) {
                 material.color.setRGB(color.r, color.g, color.b);
             }

@@ -469,7 +469,7 @@ namespace threepp {
             auto mat = aiScene->mMaterials[mi];
             aiString p;
 
-            debugMaterialTextures(mat);
+            // debugMaterialTextures(mat);
 
             // Base Color/Diffuse
             if (aiGetMaterialTextureCount(mat, aiTextureType_BASE_COLOR) > 0) {

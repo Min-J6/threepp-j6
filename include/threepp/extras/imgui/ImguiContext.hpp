@@ -18,8 +18,10 @@
 #include "RobotoRegular.cpp"
 #include "RobotoMedium.cpp"
 #include "MaterialIcons.cpp"
+#include "IconsMaterialDesignIcons.h"
 
 namespace ImGui {
+    inline ImFont* Medium26;
     inline ImFont* Medium36;
     inline ImFont* Medium50;
 
@@ -180,38 +182,8 @@ public:
         style.GrabMinSize       = 8.0f;
         style.TabBarOverlineSize= 0.0f;
 
-        ImGuiIO& io = ImGui::GetIO();
-        // Add font RobotoMedium
-        float sizePixels = 26.0f;
-        //ImFont* fontRobotoMedium = io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoMedium_compressed_data, RobotoMedium_compressed_size, sizePixels);
-        ImFont* fontRobotoMedium = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", sizePixels, NULL, io.Fonts->GetGlyphRangesKorean());
-		//io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoMedium_compressed_data, RobotoMedium_compressed_size, sizePixels);
-        IM_ASSERT(fontRobotoMedium != nullptr);
 
-        // Merge icons to font RobotoMedium
-        ImFontConfig config;
-        config.MergeMode = true;
-        config.PixelSnapH = true;
-        config.GlyphOffset = ImVec2(0.0f, 3.0f); // Offset
-        static const ImWchar ranges[] = { 0xe000, 0xf3ff, 0 };
-        ImFont* fontMaterialIcons = io.Fonts->AddFontFromMemoryCompressedTTF(&MaterialIcons_compressed_data, MaterialIcons_compressed_size, sizePixels, &config, ranges);
-        IM_ASSERT(fontMaterialIcons != nullptr);
-
-
-        // 폰트 불러오기
-        ImGui::Medium36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
-        IM_ASSERT(ImGui::Medium36 != nullptr);
-        ImGui::Medium50 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
-        IM_ASSERT(ImGui::Medium50 != nullptr);
-
-        ImGui::Bold26 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 26, NULL, io.Fonts->GetGlyphRangesKorean());
-        IM_ASSERT(ImGui::Bold26 != nullptr);
-        ImGui::Bold36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
-        IM_ASSERT(ImGui::Bold36 != nullptr);
-        ImGui::Bold50 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
-        IM_ASSERT(ImGui::Bold50 != nullptr);
-
-
+        // ImPlot 스타일
         ImPlotStyle& plotStyle = ImPlot::GetStyle();
         ImVec4* implotColors = plotStyle.Colors;
 
@@ -219,24 +191,44 @@ public:
         implotColors[ImPlotCol_PlotBg]  = ImVec4(0.13f, 0.14f, 0.15f, 1.00f); // 자식 창 배경
 
 
+        // 폰트 로딩 (NEXON Lv2 Gothic Medium)
+        ImGuiIO& io = ImGui::GetIO();
+        ImGui::Medium26 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 32, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Medium26 != nullptr);
 
-        // Add font RobotoRegular
-        // ImFont* fontRobotoRegular = io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoRegular_compressed_data, RobotoRegular_compressed_size, sizePixels);
-        // IM_ASSERT(fontRobotoRegular != nullptr);
-        //
-        // // Add large font
-        // sizePixels = 28.0f;
-        // ImFont* fontLarge = io.Fonts->AddFontFromMemoryCompressedTTF(&RobotoMedium_compressed_data, RobotoMedium_compressed_size, sizePixels);
-        // IM_ASSERT(fontLarge != nullptr);
-        //
-        // // Merge large icons to large font
-        // ImFontConfig configLarge;
-        // configLarge.MergeMode = true;
-        // configLarge.PixelSnapH = true;
-        // configLarge.GlyphOffset = ImVec2(0.0f, 4.0f); // Offset
-        // static const ImWchar rangesLarge[] = { 0xe000, 0xf3ff, 0 };
-        // auto iconLarge = io.Fonts->AddFontFromMemoryCompressedTTF(&MaterialIcons_compressed_data, MaterialIcons_compressed_size, sizePixels, &configLarge, rangesLarge);
-        // IM_ASSERT(iconLarge != nullptr);
+        // io.Fonts->AddFontDefault();
+        float baseFontSize = 32.0f; // 13.0f is the size of the default font. Change to the font size you use.
+        float iconFontSize = baseFontSize; //* 2.0f / 3.0f; // FontAwesome fonts need to have their sizes reduced by 2.0f/3.0f in order to align correctly
+
+        // merge in icons from Font Awesome
+        static const ImWchar icons_ranges[] = { ICON_MIN_MDI, ICON_MAX_MDI, 0 };
+        ImFontConfig icons_config;
+        icons_config.MergeMode = true;
+        icons_config.PixelSnapH = true;
+        icons_config.GlyphMinAdvanceX = iconFontSize;
+        io.Fonts->AddFontFromFileTTF( "resource/Fonts/materialdesignicons-webfont.ttf", iconFontSize, &icons_config, icons_ranges );
+
+        // ImFontConfig config;
+        // config.MergeMode = true;
+        // config.PixelSnapH = true;
+        // config.GlyphOffset = ImVec2(0.0f, 3.0f); // Offset
+        // static const ImWchar ranges[] = { 0xe000, 0xf3ff, 0 };
+        // ImFont* fontMaterialIcons = io.Fonts->AddFontFromMemoryCompressedTTF(&MaterialIcons_compressed_data, MaterialIcons_compressed_size, 26, &config, ranges);
+        // IM_ASSERT(fontMaterialIcons != nullptr);
+
+        ImGui::Medium36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Medium36 != nullptr);
+        ImGui::Medium50 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Medium50 != nullptr);
+
+        // 폰트 로딩 (NEXON Lv2 Gothic Bold)
+        ImGui::Bold26 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 26, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Bold26 != nullptr);
+        ImGui::Bold36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Bold36 != nullptr);
+        ImGui::Bold50 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
+        IM_ASSERT(ImGui::Bold50 != nullptr);
+
     }
 
 protected:

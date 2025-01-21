@@ -1,6 +1,8 @@
 
 #ifndef THREEPP_IMGUI_HELPER_HPP
 #define THREEPP_IMGUI_HELPER_HPP
+#include <iostream>
+#include <future>
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -20,9 +22,10 @@
 #include "MaterialIcons.cpp"
 #include "IconsMaterialDesignIcons.h"
 
-#include "Timer/ElapsedTimer.h"
 
 namespace ImGui {
+    inline ImFont* DefaultFont;
+
     inline ImFont* Medium26;
     inline ImFont* Medium36;
     inline ImFont* Medium50;
@@ -82,7 +85,6 @@ public:
         ImGui::NewFrame();
 
         onRender();
-
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -193,14 +195,13 @@ public:
         implotColors[ImPlotCol_PlotBg]  = ImVec4(0.13f, 0.14f, 0.15f, 1.00f); // 자식 창 배경
 
 
-        // io.Fonts->AddFontDefault();
         float baseFontSize = 32.0f;
 
         // 폰트 로딩 (NEXON Lv2 Gothic Medium)
         ImGuiIO& io = ImGui::GetIO();
         ImGui::Medium26 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Medium.ttf", 32, NULL, io.Fonts->GetGlyphRangesKorean());
 
-        // 아이콘 폰트 로드
+        // // 아이콘 폰트 로드
         static const ImWchar icons_ranges[] = { ICON_MIN_MDI, ICON_MAX_MDI, 0 };
         ImFontConfig icons_config;
         icons_config.MergeMode = true;
@@ -217,6 +218,7 @@ public:
         ImGui::Bold36 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 36, NULL, io.Fonts->GetGlyphRangesKorean());
         ImGui::Bold50 = io.Fonts->AddFontFromFileTTF("resource/Fonts/NEXON Lv2 Gothic Bold.ttf", 50, NULL, io.Fonts->GetGlyphRangesKorean());
 
+        ImGui::DefaultFont = io.Fonts->AddFontDefault();
     }
 
 protected:
